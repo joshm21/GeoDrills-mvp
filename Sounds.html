@@ -89,27 +89,28 @@
       padding-bottom: 5px;
     }
 
-    .row {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
+		.row {
+			display: flex;
+			flex-wrap: wrap; /* Allows items to drop to next line if tight */
+			align-items: center;
+			padding: 10px 0;
+			border-bottom: 1px solid #eee;
+		}
 
-    .lesson-label {
-      font-weight: 600;
-      min-width: 180px;
-    }
+		.lesson-label {
+			font-weight: 600;
+			min-width: 180px;
+			flex: 1 1 200px; /* Grow, shrink, and set a base width */
+			margin-bottom: 5px; /* Space when stacked */
+		}
 
-    .btn {
-      text-decoration: none;
-      background: #3498db;
-      color: white;
-      padding: 5px 12px;
-      border-radius: 4px;
-      font-size: 0.85em;
-      margin-right: 5px;
-    }
+
+		.btn {
+			display: inline-block;
+			padding: 10px 15px; /* Increased padding */
+			font-size: 1rem;    /* Larger text */
+			margin: 5px 5px 5px 0;
+		}
   </style>
 </head>
 
