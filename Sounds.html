@@ -1,271 +1,489 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ka">
 <head>
-  <meta charset="UTF-8">
-  <base target="_top">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sounds | GeoDrills</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --geo-red: #A70007;
+            --geo-dark: #2c3e50;
+            --bg: #f8f5f0;
+            --card-white: #ffffff;
+        }
 
+        body {
+            font-family: 'Noto Sans Georgian', -apple-system, sans-serif;
+            background-color: var(--bg); margin: 0; color: var(--geo-dark);
+        }
 
-    .site-header {
-      background-color: #2c3e50;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      height: 60px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
+        /* --- NAVIGATION --- */
+        .site-header {
+            background: var(--geo-dark);
+            color: white;
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 4px solid var(--geo-red);
+        }
 
-    .home-btn {
-      background: #3498db;
-      color: white;
-      text-decoration: none;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      font-size: 20px;
-      margin-right: 20px;
-    }
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
 
-    .main-nav {
-      display: flex;
-      gap: 15px;
-      overflow-x: auto;
-    }
+        .brand { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: white; }
 
-    .nav-link {
-      color: #ecf0f1;
-      text-decoration: none;
-      font-weight: 500;
-      white-space: nowrap;
-      padding: 5px 10px;
-      border-radius: 4px;
-    }
+        /* Hamburger Icon */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none; border: none; padding: 5px;
+        }
+        .menu-toggle span {
+            display: block; width: 25px; height: 3px;
+            background: white; border-radius: 2px;
+        }
 
-    .nav-link:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
+        .nav-links { display: flex; gap: 10px; }
+        .nav-link {
+            color: #ecf0f1; text-decoration: none; padding: 8px 15px;
+            border-radius: 6px; font-size: 14px; transition: 0.2s;
+        }
+        .nav-link.active { background: var(--geo-red); color: white; }
 
-    .nav-link.active {
-      border-bottom: 2px solid #3498db;
-      color: white;
-    }
+        /* --- MOBILE NAV (Under 768px) --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
 
+            .nav-links {
+                display: none; /* Hidden by default */
+                flex-direction: column;
+                position: absolute;
+                top: 60px; left: 0; width: 100%;
+                background: var(--geo-dark);
+                padding: 10px 0;
+                border-bottom: 4px solid var(--geo-red);
+            }
 
-    .container {
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
+            .nav-links.is-open { display: flex; }
+            .nav-link { width: 100%; text-align: center; border-radius: 0; padding: 15px 0; }
+        }
 
-    .section-box {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 25px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+        /* --- LAYOUT --- */
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .card {
+            background: var(--card-white); border-radius: 12px;
+            padding: 20px; margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+.badge-free {
+    background: #28a745;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+.pro-icon {
+    color: #f39c12;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.btn-level {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    background: white;
+    border: 2px solid var(--geo-dark);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--geo-dark);
+    font-weight: bold;
+    transition: 0.2s;
+}
+.btn-level:hover {
+    background: var(--bg);
+    border-color: var(--geo-red);
+}
 
-    h1 {
-      color: #2c3e50;
-    }
-
-    h2 {
-      color: #2c3e50;
-      border-bottom: 2px solid #3498db;
-      padding-bottom: 5px;
-    }
-
-		.row {
-			display: flex;
-			flex-wrap: wrap; /* Allows items to drop to next line if tight */
-			align-items: center;
-			padding: 10px 0;
-			border-bottom: 1px solid #eee;
-		}
-
-		.lesson-label {
-			font-weight: 600;
-			min-width: 180px;
-			flex: 1 1 200px; /* Grow, shrink, and set a base width */
-			margin-bottom: 5px; /* Space when stacked */
-		}
-
-
-		.btn {
-			display: inline-block;
-			padding: 10px 15px; /* Increased padding */
-			font-size: 1rem;    /* Larger text */
-			margin: 5px 5px 5px 0;
-		}
-  </style>
+    </style>
 </head>
-
 <body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="brand">🇬🇪 GeoDrills</a>
 
-  <header class="site-header">
-    <a href="Index.html" class="home-btn" title="Home">⌂</a>
-    <nav class="main-nav">
-      <a href="Sounds.html" class="nav-link active">
-        Sounds </a>
-      <a href="Verbs.html" class="nav-link ">
-        Verbs </a>
-      <a href="Nouns.html" class="nav-link ">
-        Nouns </a>
-      <a href="Pronouns.html" class="nav-link ">
-        Pronouns </a>
-      <a href="Adjectives.html" class="nav-link ">
-        Adjectives </a>
-    </nav>
-  </header>
+            <button class="menu-toggle" id="mobile-menu-btn" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
 
-  <div class="container">
-    <h1>
-      Sounds </h1>
+            <nav class="nav-links" id="nav-menu">
+                
+                <a href="Sounds.html" class="nav-link active">
+                    Sounds
+                </a>
+                
+                <a href="Verbs.html" class="nav-link ">
+                    Verbs
+                </a>
+                
+                <a href="Nouns.html" class="nav-link ">
+                    Nouns
+                </a>
+                
+                <a href="Pronouns.html" class="nav-link ">
+                    Pronouns
+                </a>
+                
+                <a href="Adjectives.html" class="nav-link ">
+                    Adjectives
+                </a>
+                
+            </nav>
+        </div>
+    </header>
 
-    <div class="section-box">
-      <h2>
-        Voiced - Aspirated - Ejective Groups </h2>
-      <div class="row">
-        <div class="lesson-label">
-          ბ, ფ, პ </div>
-        <div class="button-group">
-          <a href="App.html?drill=ea0acf7d-41b8-46ab-b1cd-43965ed51736" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=2e6f3471-a611-43d0-a86a-210e71555de8" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=aa79d8e0-d593-42d7-a7b4-5d21aad32485" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="lesson-label">
-          დ, თ, ტ </div>
-        <div class="button-group">
-          <a href="App.html?drill=43f7ad3e-a433-4bfa-8d12-1ff34e02efd5" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=66b9972f-de1a-4959-9e88-1844e08ebe96" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=ce51a59b-31ab-479b-8c17-51adce038fa5" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="lesson-label">
-          ძ, ც, წ </div>
-        <div class="button-group">
-          <a href="App.html?drill=2c81bbf3-35f5-448f-b708-886e83239ff6" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=a68f83b0-5452-4d65-9100-762562f9c74a" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=502a1f3d-0826-4b73-9b69-c275d2f69846" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="lesson-label">
-          ჯ, ჩ, ჭ </div>
-        <div class="button-group">
-          <a href="App.html?drill=fc1fd7f3-6d98-49af-ae46-e09b912d78e1" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=8660311b-a122-4fab-8646-04236f89c883" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=b467ab90-7f88-4a89-8d94-b6cb252b52ee" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="lesson-label">
-          გ, ქ, კ </div>
-        <div class="button-group">
-          <a href="App.html?drill=30578ba6-81e8-4409-afdf-06fc00013806" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=8cebda01-225f-45ac-889a-f07036b4c8e8" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=ec09c723-5010-475c-8deb-71169590249c" class="btn">Level
-            3 </a>
-        </div>
-      </div>
+    <div class="container">
+        
+    <h1>Sounds</h1>
+
+    
+        <h3 style="margin-top:25px; color: var(--geo-red);">Voiced - Aspirated - Ejective Groups</h3>
+
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        ბ, ფ, პ
+                    </div>
+                    
+                        <span class="badge-free">Free</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=38a1003a-07aa-4a21-befa-ab921ddce831" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=2e63121d-417e-4ee6-859c-bbcfeb1e6a1d" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=81bd5770-7b76-4aca-bd7d-7929d414453b" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        დ, თ, ტ
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=32cf4969-2854-480c-8796-07fed4927b5c" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=b274b40c-86bd-437a-9afa-ed692ad7cd21" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=6df3ea88-0c82-454d-acd0-2def7a62a6e9" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        ძ, ც, წ
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=c2bb19bb-ae1b-4e60-b7e6-bbc33b6fbeeb" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=9b14b3c0-edf9-4c3b-ade5-43129848cdf3" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=ead062d3-4b36-409b-9429-e042bc2b825e" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        ჯ, ჩ, ჭ
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=bf92b2b5-7f84-458d-bead-51ce5b320d38" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=eacf6f2a-b4a2-4c38-8a10-916c2482972f" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=30a252e3-8a9b-493b-9a19-9d8b9b182004" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        გ, ქ, კ
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=99fd7fb7-ad5a-4985-b852-174e30da2206" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=d0baed0f-1d1f-41de-bd3c-9e2f565b0ef9" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=c4b79c42-e264-4485-b64c-8f7621f2cb24" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+    
+        <h3 style="margin-top:25px; color: var(--geo-red);">Other Easily Confused Groups</h3>
+
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        ჰ, ხ, ღ, ყ
+                    </div>
+                    
+                        <span class="badge-free">Free</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=9dda29d7-6f14-4b74-bc55-956347f71cad" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=6977353c-2afd-4269-80e3-34c899f658d5" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=02f7c938-827c-4844-8b17-e1af0fe64ade" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        ქ, კ, ყ
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=0d37f13b-b94b-49b9-abff-eefd568fbc53" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=da2ddb62-1d38-4e6e-bcce-1ad2447e39d7" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=19180482-f9a9-467d-a979-0ce664ff3235" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        რ, ღ, ლ
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=a5714489-d326-4b44-b0a8-b124cdf62be1" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=01877aba-e7ef-4cdb-ba93-c0b3cab80a1b" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=118f38ba-fd3b-42b6-965d-ac2992c95b32" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        დ, ძ, ზ
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=1f29ac3b-88c1-47c3-b997-cd2165d0fa6e" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=ed7e22ed-d378-4f80-acd5-7812f5635c71" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=fe0660fb-f41b-4b5d-a510-9968e07867f2" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        ს, ზ, შ, ჟ
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=2badd556-a3d6-4107-9e25-aba654f252ef" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=7003fa83-23a2-48d8-9ebf-2f3bd7fb35a8" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=32906c24-d834-4f03-ae02-43393f913049" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+    
+
     </div>
-    <div class="section-box">
-      <h2>
-        Other Easily Confused Groups </h2>
-      <div class="row">
-        <div class="lesson-label">
-          ჰ, ხ, ღ, ყ </div>
-        <div class="button-group">
-          <a href="App.html?drill=92ad32af-b540-45fc-b281-e6f7891df2e3" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=c440637a-93d0-4d46-84bf-0c4db2e8aad7" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=73f0a6b3-14a2-418d-9206-66265732a280" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="lesson-label">
-          ქ, კ, ყ </div>
-        <div class="button-group">
-          <a href="App.html?drill=eaee801b-fc96-4921-b92e-a706f4cf343b" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=e84821c5-522f-47e3-b77f-932185422084" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=7e2e2534-3a2a-46a5-afaf-1440804c47f2" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="lesson-label">
-          რ, ღ, ლ </div>
-        <div class="button-group">
-          <a href="App.html?drill=b0b97ef4-f9f0-40eb-b943-34fb81bc5fff" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=efc29f5d-4f44-4fba-8e05-58325f85b82b" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=20dce232-a157-4bfa-8057-742e5970b934" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="lesson-label">
-          დ, ძ, ზ </div>
-        <div class="button-group">
-          <a href="App.html?drill=fc07e72d-db6c-49ac-9665-f2d8c980bce0" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=00987519-c816-447f-ab02-695962882764" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=7fd14556-d168-4cfe-9349-f030f16d3d80" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-      <div class="row">
-        <div class="lesson-label">
-          ს, ზ, შ, ჟ </div>
-        <div class="button-group">
-          <a href="App.html?drill=ff9644b4-6b12-4267-8f4f-3ce46e6034e1" class="btn">Level
-            1 </a>
-          <a href="App.html?drill=baaacc88-4ad9-482b-bd89-54392959b17b" class="btn">Level
-            2 </a>
-          <a href="App.html?drill=540dcf08-cda1-48a0-af47-ba00db4e221a" class="btn">Level
-            3 </a>
-        </div>
-      </div>
-    </div>
-  </div>
 
+    <script>
+        // Simple Vanilla JS for the Hamburger Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const navMenu = document.getElementById('nav-menu');
+
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('is-open');
+        });
+
+        // Close menu if clicking a link (useful for SPAs, but good practice here)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => navMenu.classList.remove('is-open'));
+        });
+    </script>
+    
 </body>
-
 </html>

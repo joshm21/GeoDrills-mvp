@@ -1,393 +1,793 @@
 <!DOCTYPE html>
-<html>
-
+<html lang="ka">
 <head>
-  <base target="_top">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verbs | GeoDrills</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --geo-red: #A70007;
+            --geo-dark: #2c3e50;
+            --bg: #f8f5f0;
+            --card-white: #ffffff;
+        }
 
-     
-    .site-header {
-      background-color: #2c3e50;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      height: 60px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
+        body {
+            font-family: 'Noto Sans Georgian', -apple-system, sans-serif;
+            background-color: var(--bg); margin: 0; color: var(--geo-dark);
+        }
 
-    .home-btn {
-      background: #3498db;
-      color: white;
-      text-decoration: none;
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 6px;
-      font-size: 20px;
-      margin-right: 20px;
-    }
+        /* --- NAVIGATION --- */
+        .site-header {
+            background: var(--geo-dark);
+            color: white;
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 4px solid var(--geo-red);
+        }
 
-    .main-nav {
-      display: flex;
-      gap: 15px;
-      overflow-x: auto;
-    }
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
 
-    .nav-link {
-      color: #ecf0f1;
-      text-decoration: none;
-      font-weight: 500;
-      white-space: nowrap;
-      padding: 5px 10px;
-      border-radius: 4px;
-    }
+        .brand { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: white; }
 
-    .nav-link:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
+        /* Hamburger Icon */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none; border: none; padding: 5px;
+        }
+        .menu-toggle span {
+            display: block; width: 25px; height: 3px;
+            background: white; border-radius: 2px;
+        }
 
-    .nav-link.active {
-      border-bottom: 2px solid #3498db;
-      color: white;
-    }
+        .nav-links { display: flex; gap: 10px; }
+        .nav-link {
+            color: #ecf0f1; text-decoration: none; padding: 8px 15px;
+            border-radius: 6px; font-size: 14px; transition: 0.2s;
+        }
+        .nav-link.active { background: var(--geo-red); color: white; }
 
-     
-    .container {
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
+        /* --- MOBILE NAV (Under 768px) --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
 
-    .section-box {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 25px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
+            .nav-links {
+                display: none; /* Hidden by default */
+                flex-direction: column;
+                position: absolute;
+                top: 60px; left: 0; width: 100%;
+                background: var(--geo-dark);
+                padding: 10px 0;
+                border-bottom: 4px solid var(--geo-red);
+            }
 
-    h1 {
-      color: #2c3e50;
-    }
+            .nav-links.is-open { display: flex; }
+            .nav-link { width: 100%; text-align: center; border-radius: 0; padding: 15px 0; }
+        }
 
-    h2 {
-      color: #2c3e50;
-      border-bottom: 2px solid #3498db;
-      padding-bottom: 5px;
-    }
+        /* --- LAYOUT --- */
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .card {
+            background: var(--card-white); border-radius: 12px;
+            padding: 20px; margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+.badge-free {
+    background: #28a745;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+.pro-icon {
+    color: #f39c12;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.btn-level {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    background: white;
+    border: 2px solid var(--geo-dark);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--geo-dark);
+    font-weight: bold;
+    transition: 0.2s;
+}
+.btn-level:hover {
+    background: var(--bg);
+    border-color: var(--geo-red);
+}
 
-    .row {
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid #eee;
-    }
-
-    .lesson-label {
-      font-weight: 600;
-      min-width: 180px;
-    }
-
-    .btn {
-      text-decoration: none;
-      background: #3498db;
-      color: white;
-      padding: 5px 12px;
-      border-radius: 4px;
-      font-size: 0.85em;
-      margin-right: 5px;
-    }
-  </style>
+    </style>
 </head>
-
 <body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="brand">🇬🇪 GeoDrills</a>
 
-  <header class="site-header">
-    <a href="Index.html" class="home-btn" title="Home">⌂</a>
-    <nav class="main-nav">
-            <a href="Sounds.html" class="nav-link ">
-        Sounds      </a>
-            <a href="Verbs.html" class="nav-link active">
-        Verbs      </a>
-            <a href="Nouns.html" class="nav-link ">
-        Nouns      </a>
-            <a href="Pronouns.html" class="nav-link ">
-        Pronouns      </a>
-            <a href="Adjectives.html" class="nav-link ">
-        Adjectives      </a>
-          </nav>
-  </header>
+            <button class="menu-toggle" id="mobile-menu-btn" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
 
-  <div class="container">
-    <h1>
-      Verbs    </h1>
+            <nav class="nav-links" id="nav-menu">
+                
+                <a href="Sounds.html" class="nav-link ">
+                    Sounds
+                </a>
+                
+                <a href="Verbs.html" class="nav-link active">
+                    Verbs
+                </a>
+                
+                <a href="Nouns.html" class="nav-link ">
+                    Nouns
+                </a>
+                
+                <a href="Pronouns.html" class="nav-link ">
+                    Pronouns
+                </a>
+                
+                <a href="Adjectives.html" class="nav-link ">
+                    Adjectives
+                </a>
+                
+            </nav>
+        </div>
+    </header>
 
-            <div class="section-box">
-      <h2>
-        By Tense      </h2>
-            <div class="row">
-        <div class="lesson-label">
-          Present        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=e4606713-b073-4d83-8e42-930e20e23835" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=e9c87541-00c3-43d3-b92d-754729ad7206" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=f1d37149-2a83-4309-9c7a-5a7f8aa5134a" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Future        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=c9879e53-47ed-4762-af0b-b87addf706de" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=438a15ae-2a10-40f5-9f24-563311f7be22" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=98d37ece-8656-47d1-ba1f-957c38b5129a" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Imperfect        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=ef6759fd-d026-4d46-81c3-7f80f4dfd30f" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=b0c41cd2-aa9a-4d45-b7ba-db507fcec391" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=c7ecdcfb-9b10-490d-bbde-d0312721c677" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Conditional        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=d7456fac-2c98-49f9-aa6c-6d47c2d26341" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=d63aa3d9-75bc-40dd-89d1-7374f96f3614" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=c5f4a483-d71f-4f69-862f-6da8e4550fa2" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Tense Review 1        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=5568cd53-8f51-4b1f-af71-d902bd4f32b9" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=6c48b1b1-cc40-4d54-85b8-c13133c155c2" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=fcf99362-9196-4ad2-9561-ff5f92d4e9ae" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Aorist        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=7c5d8939-830a-4363-b561-30430fc07a10" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=b0d831ac-488b-444a-aeb9-7543ce9942d1" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=2131b1e3-2eb9-40d6-9f6f-7a0a063a2cb2" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Optative        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=e5cfecd6-84c0-423c-82c9-b632a16ff6fa" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=10c7992d-a09d-467b-8f9b-a86484601a9f" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=ad659340-6095-46bb-a409-1279f1c4cb22" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Tense Review 2        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=c39c3f4d-9ab8-478f-935f-77a1982c73b7" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=729ea74f-3bac-41e1-b99d-bd8fc479b1f4" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=20b4adea-99c7-4984-a5ec-874dcc732fa2" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Review All        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=a3bdf338-29ed-42f7-9b9f-773b05f05a14" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=d14c3089-8f73-4adb-8e01-a4fab9d742b1" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=48232091-ab4d-4786-a73a-db9b7af4e7d0" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-          </div>
-        <div class="section-box">
-      <h2>
-        By Subject      </h2>
-            <div class="row">
-        <div class="lesson-label">
-          1st Singular        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=f52a144d-0a33-46bd-ae35-d281c0444b58" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=79844c26-9eba-4616-9609-e777759923d4" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=479d31bc-5a89-4b1f-97b0-5d76ab6ed3e2" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          2nd Singular        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=e727212e-65f6-46fa-a783-fd643d2e722b" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=1bc36dab-2cdd-41fd-9aae-88a854233c22" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=1240ad96-7e44-44e4-ac8a-89709a9be928" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          3rd Singular        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=2089ee48-3417-4174-a527-b2212ad0ae40" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=b47f5ac4-80f0-47c4-aafe-5cf424f59b42" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=7f6f866e-dad2-4bf7-a753-e26caf3621e9" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          1st Plural        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=d2f62eef-6604-4447-bd82-c591e42d628a" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=cce4ec6d-fb63-45b1-89ee-7125fe115a95" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=7e9ae28c-857f-452c-8bae-2c3994dc44cf" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          2nd Plural        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=6fcbc65c-3de1-4465-acfa-d68bbfa6560e" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=b6025118-9d9d-4f35-8cde-30dbe0f0d560" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=9d7a3b27-9cf8-420e-bd6d-594992a0f9b8" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          3rd Plural        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=082b947a-2717-4d3c-88e6-7575490607ab" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=dbd73bde-33e0-4ebd-b6e7-017a2d0d5680" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=57b66d57-c198-429d-ad46-d59194eb5d54" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Review All        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=cfe09002-0b16-499b-afe2-b609108cec70" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=0e8a874b-b66e-4045-b89a-f37ea29c20fe" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=bb6f365b-4f95-47c3-8b0f-77713bfc2005" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-          </div>
-        <div class="section-box">
-      <h2>
-        Special Verb Types      </h2>
-            <div class="row">
-        <div class="lesson-label">
-          Inverted Verbs        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=327288b2-44c7-454d-9f14-794865a0daa8" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=0a484a91-d1e0-46be-ab2d-f33fca47a468" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=f1cba812-7f85-4a6c-8ac5-87860d1843c2" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Verbs of Motion        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=1227918a-0ba4-488f-b07f-8e569e0380b4" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=fced2e46-533a-4ef5-b5cb-c3a9e701c515" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=c6aa75db-dbce-4249-b288-90c2f4fadf6d" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Irregular Verbs        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=40584049-ac8e-48eb-b1ed-f285d3e5e8a0" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=900b8455-b7a1-402f-872e-14a79e8298d0" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=80ecb690-8a71-47c7-b7be-ec1024bee0d7" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-            <div class="row">
-        <div class="lesson-label">
-          Verbs with Object Markers        </div>
-        <div class="button-group">
-                    <a href="App.html?drill=bdafa4e3-419d-4f9f-b66d-216bbe07da21" class="btn">Level
-            1          </a>
-                    <a href="App.html?drill=d95a785a-58c7-4f6b-89ea-b7edf6e46c7d" class="btn">Level
-            2          </a>
-                    <a href="App.html?drill=a1fbf806-8d5e-4f44-9635-8b23ebb37a05" class="btn">Level
-            3          </a>
-                  </div>
-      </div>
-          </div>
-          </div>
+    <div class="container">
+        
+    <h1>Verbs</h1>
 
+    
+        <h3 style="margin-top:25px; color: var(--geo-red);">By Tense</h3>
+
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Present
+                    </div>
+                    
+                        <span class="badge-free">Free</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=19a2b30d-2b57-4d52-9c0b-d91185f5f9f9" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=45732550-db8f-48ca-a6d7-4dec7a2ce851" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=91022271-ff28-4d43-a8d6-7bcad4bf21b8" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Future
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=ab44d844-5f5f-46ef-a8a8-4f2bbab2ac34" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=c9bd48cc-7d7c-4cb4-85cb-0b95b2bf6513" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=915f1e58-ea39-4729-b131-7447145107eb" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Imperfect
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=c766b761-3816-4b61-b6e8-3002ad606d20" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=1bd4f0f7-7c86-44cd-868e-e85f26adbb02" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=1050f41b-5c51-4963-89fc-bdbf92b1cbbc" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Conditional
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=9efde7cf-f5c6-454c-b4a2-a4b10295d02d" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=aa51a4f2-257f-4868-b873-8893cd2c3e0d" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=4f131049-d2c3-4bbd-b2d6-8dcf0eda3c3f" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Tense Review 1
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=5ab80d9f-b53f-4e18-a093-88376a6ba1cc" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=5c8a9a56-d53c-4751-9d59-08e1525cad95" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=84d7da28-dfc4-4c96-b99a-11e330777f66" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Aorist
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=5ac5b7ae-96f5-4eda-8384-ad28f0bd88a3" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=4a7325eb-0ebe-4d11-b854-036e6027875d" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=34d82478-488f-4431-b2df-824201ef47f8" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Optative
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=7d076559-7036-4d1e-9ea7-462d0c8503e4" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=31f2c9f8-991c-45a2-854b-f58367d1a5c0" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=ad34c0af-38e3-4db4-b928-6489db022984" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Tense Review 2
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=2ad65d97-0540-4bf2-9599-7dc960aa3dde" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=e94e8b4c-182a-4356-a6e7-e20e4a461e81" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=e417432b-a6ad-4145-905e-e90d1c3e8d91" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Review All
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=fb769328-2f94-4f8d-8622-f2059c0d8b51" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=3719b029-1c5a-4dce-b8fd-28583e4d3e15" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=c17f0292-74bd-4c47-8fb3-b6aa72b3dd5e" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+    
+        <h3 style="margin-top:25px; color: var(--geo-red);">By Subject</h3>
+
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        1st Singular
+                    </div>
+                    
+                        <span class="badge-free">Free</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=885e195b-dd31-43f4-9bae-491e5af584fa" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=d54f6295-7fc4-4e23-b6af-215025f433ea" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=1c234ba3-df8e-4a8d-af1f-2ec0c8be6877" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        2nd Singular
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=cc61cf68-89fb-49fa-b93c-df3c6a108c73" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=2d79a319-c3f9-4c1e-9305-299cbdc78dfb" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=1dd7339f-24ad-4d3d-9a2e-11c594693bd4" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        3rd Singular
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=1d7d2cdd-120b-473e-9ee3-f002339aa9dd" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=1f96ec03-01d3-47e8-a9ec-e1aa1c6e1c3b" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=1e8be480-694e-4b67-b42b-72e8aadd3b4d" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        1st Plural
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=6e346dbe-68d2-4ae2-a510-25e45690678a" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=c6a92fe3-41e2-4d5a-b5e3-3f5c45ec54bf" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=93608017-8edd-43ff-af96-9592df45ca70" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        2nd Plural
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=07600a58-91dd-4b79-9f2a-0675a17741d6" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=1cbd7c61-81ba-444c-a6ce-6e328623e857" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=d068ac39-4575-4651-a65d-d67a8e9dff93" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        3rd Plural
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=9c558731-6f0e-4a8b-959a-f4d077f26b54" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=4beaadaa-1e5b-4921-a169-0f41c47c4ba9" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=ee22a213-6922-4173-81fd-349301151d7c" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Review All
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=1dc4cd5b-52b3-4b3b-b54e-07bcf7e26bee" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=6bdf664c-ed68-4a3a-b15d-7ae9f8a02bbb" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=9574c730-375b-47d6-a499-89b54e21cbe4" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+    
+        <h3 style="margin-top:25px; color: var(--geo-red);">Special Verb Types</h3>
+
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Inverted Verbs
+                    </div>
+                    
+                        <span class="badge-free">Free</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=30558ae0-cf6a-40c5-9ca3-cbfb07dfba3a" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=84dec2a2-8cae-4a9c-a4bf-c0e19365e4a0" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=ea495d62-b1de-4a98-b5b1-d50426fbe520" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Verbs of Motion
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=cf1a413b-889f-4130-a270-03d3c6dd42a6" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=13cdc00b-441d-4fdb-a0b5-a7930e3b9e6b" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=a22e0a44-0196-451e-a55b-95ec723ccd48" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Irregular Verbs
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=88dfb741-91cd-4f95-92eb-7876171e9c6a" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=a057735e-b17f-44e8-b920-5dfa67e0e688" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=a6073b06-5798-4e72-89e9-d432e95c0b2b" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+            
+            
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        Verbs with Object Markers
+                    </div>
+                    
+                        <span class="pro-icon">⭐ PRO</span>
+                    
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    
+                        <a href="App.html?drill=21bd58fe-1797-44a9-a890-330d0becdc69" class="btn-level">
+                            L1
+                        </a>
+                    
+                        <a href="App.html?drill=b9e84c0f-882d-4855-a83d-41ec0c23cd87" class="btn-level">
+                            L2
+                        </a>
+                    
+                        <a href="App.html?drill=671c2e6f-e20c-46b7-859c-06c0d5c8fbcd" class="btn-level">
+                            L3
+                        </a>
+                    
+                </div>
+            </div>
+        
+    
+
+    </div>
+
+    <script>
+        // Simple Vanilla JS for the Hamburger Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const navMenu = document.getElementById('nav-menu');
+
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('is-open');
+        });
+
+        // Close menu if clicking a link (useful for SPAs, but good practice here)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => navMenu.classList.remove('is-open'));
+        });
+    </script>
+    
 </body>
-
 </html>

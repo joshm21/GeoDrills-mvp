@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ka">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home | GeoDrills</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --geo-red: #A70007;
+            --geo-dark: #2c3e50;
+            --bg: #f8f5f0;
+            --card-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Noto Sans Georgian', -apple-system, sans-serif;
+            background-color: var(--bg); margin: 0; color: var(--geo-dark);
+        }
+
+        /* --- NAVIGATION --- */
+        .site-header {
+            background: var(--geo-dark);
+            color: white;
+            position: sticky; top: 0; z-index: 1000;
+            border-bottom: 4px solid var(--geo-red);
+        }
+
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .brand { font-weight: bold; font-size: 1.2rem; text-decoration: none; color: white; }
+
+        /* Hamburger Icon */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            background: none; border: none; padding: 5px;
+        }
+        .menu-toggle span {
+            display: block; width: 25px; height: 3px;
+            background: white; border-radius: 2px;
+        }
+
+        .nav-links { display: flex; gap: 10px; }
+        .nav-link {
+            color: #ecf0f1; text-decoration: none; padding: 8px 15px;
+            border-radius: 6px; font-size: 14px; transition: 0.2s;
+        }
+        .nav-link.active { background: var(--geo-red); color: white; }
+
+        /* --- MOBILE NAV (Under 768px) --- */
+        @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
+
+            .nav-links {
+                display: none; /* Hidden by default */
+                flex-direction: column;
+                position: absolute;
+                top: 60px; left: 0; width: 100%;
+                background: var(--geo-dark);
+                padding: 10px 0;
+                border-bottom: 4px solid var(--geo-red);
+            }
+
+            .nav-links.is-open { display: flex; }
+            .nav-link { width: 100%; text-align: center; border-radius: 0; padding: 15px 0; }
+        }
+
+        /* --- LAYOUT --- */
+        .container { max-width: 600px; margin: 0 auto; padding: 15px; }
+        .card {
+            background: var(--card-white); border-radius: 12px;
+            padding: 20px; margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        
+.hero {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(to bottom, #2c3e50, #1a252f);
+    color: white;
+    margin: -15px -15px 30px -15px;
+}
+.hero h1 { font-size: 2.5rem; margin-bottom: 10px; }
+.hero p { font-size: 1.2rem; max-width: 600px; margin: 0 auto 30px auto; opacity: 0.9; }
+
+.cta-btn {
+    display: inline-block;
+    background: var(--geo-red);
+    color: white;
+    padding: 18px 35px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(167, 0, 7, 0.4);
+}
+
+.mastery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 40px 0;
+}
+
+@media (max-width: 768px) {
+    .mastery-grid { grid-template-columns: 1fr; }
+}
+
+.transformation-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 30px;
+    margin: 40px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.transform-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-container">
+            <a href="index.html" class="brand">🇬🇪 GeoDrills</a>
+
+            <button class="menu-toggle" id="mobile-menu-btn" aria-label="Menu">
+                <span></span><span></span><span></span>
+            </button>
+
+            <nav class="nav-links" id="nav-menu">
+                
+                <a href="Sounds.html" class="nav-link ">
+                    Sounds
+                </a>
+                
+                <a href="Verbs.html" class="nav-link ">
+                    Verbs
+                </a>
+                
+                <a href="Nouns.html" class="nav-link ">
+                    Nouns
+                </a>
+                
+                <a href="Pronouns.html" class="nav-link ">
+                    Pronouns
+                </a>
+                
+                <a href="Adjectives.html" class="nav-link ">
+                    Adjectives
+                </a>
+                
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        
+<section class="hero">
+    <h1>Speak Without the Struggle.</h1>
+    <p>Trade the grammar tables for muscle memory. Our drills turn complex Georgian rules into instant reflexes, so you can focus on the conversation, not the rules.</p>
+    <a href="Verbs.html" class="cta-btn">Start Drilling Now — It's Free</a>
+</section>
+
+<section>
+    <h2>Stop Thinking, Start Feeling</h2>
+    <p>Georgian grammar often feels like mental gymnastics. Look at: <strong>"The big dog saw me."</strong></p>
+
+    <div class="transformation-box">
+        <div class="transform-row"><strong>ძაღლი (Dog)</strong> <span style="color:var(--geo-red)">→</span> <strong>ძაღლმა</strong></div>
+        <div class="transform-row"><strong>დიდი (Big)</strong> <span style="color:var(--geo-red)">→</span> <strong>დიდმა</strong></div>
+        <div class="transform-row"><strong>ნახა (Saw)</strong> <span style="color:var(--geo-red)">→</span> <strong>მნახა</strong></div>
+        <p style="margin-top:20px; font-style: italic; color: #555;">
+            Native speakers don't calculate these endings—they intuit them. By drilling these specific shifts, you build the same muscle memory.
+        </p>
+    </div>
+</section>
+
+<section>
+    <h2>The 3-Step Mastery System</h2>
+    <div class="mastery-grid">
+        <div class="card">
+            <h4 style="margin-top:0">Level 1: Recognition</h4>
+            <p style="font-size: 0.9rem;">The "Warm Up." Train your brain to recognize the correct forms and sounds instantly.</p>
+        </div>
+        <div class="card">
+            <h4 style="margin-top:0">Level 2: Modification</h4>
+            <p style="font-size: 0.9rem;">The "Practice." Learn to manually shift base words into the correct forms.</p>
+        </div>
+        <div class="card">
+            <h4 style="margin-top:0">Level 3: Production</h4>
+            <p style="font-size: 0.9rem;">"Game Time." Produce the correct Georgian sentences from scratch with no hints.</p>
+        </div>
+    </div>
+</section>
+
+<section style="text-align:center; margin-top:60px;">
+    <h2>50 GEL. Lifetime Access.</h2>
+    <p>The first lesson of every module is free. Unlock the other 500+ specialized drills for a one-time payment.</p>
+    <a href="Signup.html" class="cta-btn" style="background:var(--geo-dark)">Create Your Account</a>
+</section>
+
+    </div>
+
+    <script>
+        // Simple Vanilla JS for the Hamburger Toggle
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const navMenu = document.getElementById('nav-menu');
+
+        menuBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('is-open');
+        });
+
+        // Close menu if clicking a link (useful for SPAs, but good practice here)
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => navMenu.classList.remove('is-open'));
+        });
+    </script>
+    
+</body>
+</html>
