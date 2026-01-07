@@ -94,7 +94,6 @@
 #app {
     width: 100%;
     max-width: 650px;
-    min-height: calc(100vh - 150px);
     margin: 0 auto;
     display: flex;
     flex-direction: column;
@@ -104,7 +103,6 @@
 .content-section {
     display: flex;
     flex-direction: column;
-    flex: 1;
     padding: 1rem;
 }
 
@@ -247,8 +245,32 @@ input[type="text"]:focus { border-color: var(--geo-red); }
     margin-bottom: 15px;
     font-weight: bold;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+}
+
+.diff-char {
+    font-size: 1.4rem; /* Larger for readability */
+    letter-spacing: 1px;
+}
+
+.diff-deletion {
+    color: var(--geo-red);
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.diff-insertion {
+    color: #28a745;
+    background: #f0fff4;
+    border-bottom: 2px solid #28a745;
+    padding: 0 1px;
+    border-radius: 2px;
+}
+
+.diff-match {
+    color: #444;
 }
 
     </style>
@@ -293,7 +315,7 @@ input[type="text"]:focus { border-color: var(--geo-red); }
 <div id="app" v-cloak>
     
     <div v-if="!currentCard" class="content-section" style="text-align:center; justify-content:center;">
-        <p v-if="!errorMessage">Loading first question...</p>
+        <p v-if="!errorMessage">Loading...</p>
         <p v-else style="color: var(--geo-red)">{{ errorMessage }}</p>
     </div>
 
@@ -311,11 +333,18 @@ input[type="text"]:focus { border-color: var(--geo-red); }
         </div>
 
         <div class="response-area">
-            <div class="feedback-area">
-                <span v-if="feedback.msg" :style="{ color: feedback.type === 'success' ? '#28a745' : 'var(--geo-red)' }">
-                    {{ feedback.msg }}
-                </span>
-            </div>
+        	<div class="feedback-area">
+		    <div v-if="feedback.msg" :style="{ color: feedback.type === 'success' ? '#28a745' : 'var(--geo-red)', marginBottom: feedback.diff ? '4px' : '0' }">
+			{{ feedback.msg }}
+		    </div>
+
+		    <div v-if="feedback.type === 'error' && feedback.diff" class="diff-display">
+			<span v-for="(part, i) in feedback.diff" :key="i" :class="'diff-' + part.type" class="diff-char">
+			    {{ part.char }}
+			</span>
+		    </div>
+		</div>
+
 
             <div v-if="currentCard.response?.choices" class="response-grid">
                 <div v-for="(choice, i) in currentCard.response.choices" 
@@ -344,7 +373,7 @@ input[type="text"]:focus { border-color: var(--geo-red); }
                     </button>
                 </div>
                 <button class="btn btn-primary" :disabled="!recordedUrl || isRecording" @click="toggleCorrectPlayback">
-                    {{ correctAudioPlaying ? '⏸ Pause' : '🔊 Listen to Correct' }}
+                    {{ correctAudioPlaying ? '⏸ Pause' : '🔊 Listen and Compare' }}
                 </button>
                 <audio ref="userAudioRef" :src="recordedUrl" hidden></audio>
                 <audio ref="correctAudioRef" :src="currentCard.response.audioAnswer" hidden></audio>
@@ -356,7 +385,7 @@ input[type="text"]:focus { border-color: var(--geo-red); }
                     :class="{ 'btn-next-active': feedback.type === 'success' && nextCard }" 
                     @click="advanceToNext" 
                     :disabled="!nextCard">
-                {{ nextCard ? 'Next Question (Enter)' : 'Loading...' }}
+                {{ nextCard ? 'Next (Enter)' : 'Loading...' }}
             </button>
         </div>
     </div>
@@ -425,7 +454,7 @@ input[type="text"]:focus { border-color: var(--geo-red); }
                     handleAudioAutoplay();
                     if (textInputRef.value) nextTick(() => textInputRef.value.focus());
                 } else {
-                    errorMessage.value = "Failed to load data from API.";
+                    errorMessage.value = "Error loading data.";
                 }
             };
 
@@ -461,14 +490,65 @@ input[type="text"]:focus { border-color: var(--geo-red); }
                     {msg: '❌ Try again.', type: 'error'};
             };
 
-            const checkText = () => {
-                if (!textInput.value.trim() && !feedback.value.msg) return;
-                const answer = currentCard.value?.response?.textAnswer || '';
-                const isCorrect = textInput.value.toLowerCase().trim() === answer.toLowerCase().trim();
-                feedback.value = isCorrect ?
-                    {msg: '✅ Correct!', type: 'success'} : 
-                    {msg: `❌ Expected: ${answer}`, type: 'error'};
-            };
+	    const getDiff = (input, expected) => {
+	    	// longest common substring algorithm
+		    const n = input.length;
+		    const m = expected.length;
+
+		    // Create a 2D matrix for the Longest Common Subsequence
+		    const dp = Array(n + 1).fill(0).map(() => Array(m + 1).fill(0));
+
+		    for (let i = 1; i <= n; i++) {
+			    for (let j = 1; j <= m; j++) {
+				    if (input[i - 1] === expected[j - 1]) {
+					    dp[i][j] = dp[i - 1][j - 1] + 1;
+				    } else {
+					    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+				    }
+			    }
+		    }
+
+		    // Backtrack to build the diff
+		    let i = n, j = m;
+		    const result = [];
+
+		    while (i > 0 || j > 0) {
+			    if (i > 0 && j > 0 && input[i - 1] === expected[j - 1]) {
+				    // Characters match
+				    result.unshift({ char: input[i - 1], type: 'match' });
+				    i--; j--;
+			    } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+				    // This character was missing (Insertion needed)
+				    result.unshift({ char: expected[j - 1], type: 'insertion' });
+				    j--;
+			    } else if (i > 0 && (j === 0 || dp[i][j - 1] < dp[i - 1][j])) {
+				    // This character was extra (Deletion needed)
+				    result.unshift({ char: input[i - 1], type: 'deletion' });
+				    i--;
+			    }
+		    }
+		    return result;
+	    };
+
+	    const checkText = () => {
+		    const input = textInput.value.trim();
+		    const answer = currentCard.value?.response?.textAnswer || '';
+		    if (!input && !feedback.value.msg) return;
+		    const isCorrect = input.toLowerCase() === answer.toLowerCase();
+		    if (isCorrect) {
+			    feedback.value = { 
+				msg: '✅ Correct!', 
+				type: 'success', 
+				diff: null 
+			    };
+		    } else {
+			    feedback.value = { 
+				msg: '❌ Not quite.', 
+				type: 'error', 
+				diff: getDiff(input, answer) 
+			    };
+		    }
+	    };
 
             const handleRecordClick = async () => {
                 if (isRecording.value) {
@@ -512,16 +592,25 @@ input[type="text"]:focus { border-color: var(--geo-red); }
             onMounted(() => {
                 loadInitialData();
                 window.addEventListener('keydown', (e) => {
+		    // Number Keys: Select Multiple Choice
                     if (currentCard.value?.response?.choices) {
                         const num = parseInt(e.key);
                         if (!isNaN(num) && num >= 1 && num <= currentCard.value.response.choices.length) {
                             selectCard(num - 1, currentCard.value.response.choices[num - 1].isCorrect);
                         }
                     }
-                    if (e.key === 'Enter') {
-                        if (feedback.value.type === 'success' && nextCard.value) advanceToNext();
-                        else if (currentCard.value?.response?.textAnswer !== undefined) checkText();
-                    }
+                    // Enter Key: Check then Advance
+		    if (e.key === 'Enter') {
+			// If feedback is already showing, the user has seen the result, so move to next
+			if (feedback.value.msg) {
+			    if (nextCard.value) advanceToNext();
+			} 
+			// If no feedback is showing, this is the first press: run the check
+			else if (currentCard.value?.response?.textAnswer !== undefined) {
+			    checkText();
+			}
+		    }
+		    // Space Key: Play Audio
                     if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
                         e.preventDefault();
                         handleAudioAutoplay();
