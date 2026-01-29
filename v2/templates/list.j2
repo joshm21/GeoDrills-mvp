@@ -1,0 +1,72 @@
+{% extends "base.j2" %}
+
+{% block title %}{{ page.title }}{% endblock %}
+
+{% block extra_style %}
+.badge-free {
+    background: #28a745;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+}
+.pro-icon {
+    color: #f39c12;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.btn-level {
+    flex: 1;
+    text-align: center;
+    padding: 12px;
+    background: white;
+    border: 2px solid var(--geo-dark);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--geo-dark);
+    font-weight: bold;
+    transition: 0.2s;
+}
+.btn-level:hover {
+    background: var(--bg);
+    border-color: var(--geo-red);
+}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ page.title }}</h1>
+
+    {% for section in page.sections %}
+        <h3 style="margin-top:25px; color: var(--geo-red);">{{ section.heading }}</h3>
+
+        {% for lesson in section.lessons %}
+            {# Loop.first logic: the first lesson of every section is free #}
+            {% set is_free = loop.first %}
+
+            <div class="card" style="border-left: 5px solid var(--geo-red);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div style="font-size: 1.1rem; font-weight: bold;">
+                        {{ lesson.name }}
+                    </div>
+                    {% if is_free %}
+                        <span class="badge-free">Free</span>
+                    {% else %}
+                        <span class="pro-icon">⭐ PRO</span>
+                    {% endif %}
+                </div>
+
+                <div style="display: flex; gap: 8px;">
+                    {% for level in lesson.levels %}
+                        <a href="App.html?drill={{ level.uid }}" class="btn-level">
+                            L{{ level.num }}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    {% endfor %}
+{% endblock %}

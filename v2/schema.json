@@ -1,0 +1,186 @@
+{
+	"config": {
+		"site_name": "GeoDrills",
+		"theme": {
+      "primary": "#A70007",
+      "background": "#fdfaf5"
+    },
+		"uuid_seed": "this-is-my-secret",
+		"api_base": "https://script.google.com/macros/s/AKfycby8ysnyr83c-vYmQ9QZtz6z1Til2BwlICE2O0nL8KrVjEYIwO3zZ4P0H2hHELeW6uSbQQ/exec"
+	},
+	"pages": [
+		{
+			"title": "Sounds",
+			"sections": [
+				{
+					"heading": "Voiced - Aspirated - Ejective Groups",
+					"lessons": [
+						"ბ, ფ, პ",
+						"დ, თ, ტ",
+						"ძ, ც, წ",
+						"ჯ, ჩ, ჭ",
+						"გ, ქ, კ"
+					]
+				},
+				{
+					"heading": "Other Easily Confused Groups",
+					"lessons": [
+						"ჰ, ხ, ღ, ყ",
+						"ქ, კ, ყ",
+						"რ, ღ, ლ",
+						"დ, ძ, ზ",
+						"ს, ზ, შ, ჟ"
+					]
+				}
+			]
+		},
+		{
+			"title": "Verbs",
+			"sections": [
+				{
+					"heading": "By Tense",
+					"lessons": [
+						"Present",
+						"Future",
+						"Imperfect",
+						"Conditional",
+						"Tense Review 1",
+						"Aorist",
+						"Optative",
+						"Tense Review 2",
+						"Review All"
+					]
+				},
+				{
+					"heading": "By Subject",
+					"lessons": [
+						"1st Singular",
+						"2nd Singular",
+						"3rd Singular",
+						"1st Plural",
+						"2nd Plural",
+						"3rd Plural",
+						"Review All"
+					]
+				},
+				{
+					"heading": "Special Verb Types",
+					"lessons": [
+						"Inverted Verbs",
+						"Verbs of Motion",
+						"Irregular Verbs",
+						"Verbs with Object Markers"
+					]
+				}
+			]
+		},
+		{
+			"title": "Nouns",
+			"sections": [
+				{
+					"heading": "By Case",
+					"lessons": [
+						"Plural",
+						"Dative/Accusative",
+						"Genitive",
+						"Instrumental",
+						"Ergative",
+						"Adverbial",
+						"Vocative",
+						"Review Cases"
+					]
+				},
+				{
+					"heading": "By Postposition",
+					"lessons": [
+						"ში",
+						"ზე",
+						"თან",
+						"გან",
+						"კენ",
+						"თვის",
+						"დან",
+						"მდე",
+						"Review Postpositions"
+					]
+				}
+			]
+		},
+		{
+			"title": "Pronouns",
+			"sections": [
+				{
+					"heading": "By Case",
+					"lessons": [
+						"Dative/Accusative",
+						"Genitive",
+						"Instrumental",
+						"Ergative",
+						"Adverbial",
+						"Review Cases"
+					]
+				},
+				{
+					"heading": "By Postposition",
+					"lessons": [
+						"ში",
+						"ზე",
+						"თან",
+						"გან",
+						"კენ",
+						"თვის",
+						"დან",
+						"მდე",
+						"Review Postpositions"
+					]
+				},
+				{
+					"heading": "By Type",
+					"lessons": [
+						"Personal / Possessive",
+						"Interrogative / Relative",
+						"Demonstrative",
+						"Indefinite / Negative"
+					]
+				}
+			]
+		},
+		{
+			"title": "Adjectives",
+			"sections": [
+				{
+					"heading": "As Modifiers",
+					"lessons": [
+						"Dative/Accusative",
+						"Genitive",
+						"Instrumental",
+						"Ergative",
+						"Adverbial",
+						"Vocative",
+						"Review As Modifiers"
+					]
+				},
+				{
+					"heading": "As 'Nouns' (noun left out)",
+					"lessons": [
+						"Dative/Accusative",
+						"Genitive",
+						"Instrumental",
+						"Ergative",
+						"Adverbial",
+						"Vocative",
+						"Review As Nouns"
+					]
+				},
+				{
+					"heading": "Other Topics",
+					"lessons": [
+						"As Adverbs",
+						"From Nouns",
+						"Comparison and Superlative"
+					]
+				}
+			]
+		}
+	]
+}

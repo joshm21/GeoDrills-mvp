@@ -1,0 +1,498 @@
+{% extends "base.j2" %}
+
+{% block title %}Drill{% endblock %}
+
+{% block extra_style %}
+/* 1. GLOBAL DEFAULTS & ANTI-FLICKER */
+[v-cloak] { display: none !important; }
+
+* { 
+    box-sizing: border-box; /* Fixes input and button overflow */
+}
+
+#app {
+    width: 100%;
+    max-width: 650px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 2. LAYOUT SECTIONS */
+.content-section {
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+}
+
+.prompt-area {
+    flex: 0 0 auto;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    border-bottom: 2px solid #eee;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+}
+
+.media-placeholder {
+    height: 70px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.question-img {
+    max-height: 100%;
+    max-width: 100%;
+    border-radius: 8px;
+    object-fit: contain;
+}
+
+.response-area {
+    flex: 1;
+}
+
+/* 3. CARDS & GRID */
+.response-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr 1fr; 
+}
+
+.card {
+    position: relative;
+    border: 2px solid #eee;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    cursor: pointer;
+    background: #fff;
+    text-align: center;
+    font-weight: bold;
+    transition: transform 0.1s, border-color 0.2s;
+}
+
+.card:active { transform: scale(0.98); }
+.card.correct { border-color: #28a745; background: #f0fff4; }
+.card.incorrect { border-color: var(--geo-red); background: #fff5f5; }
+
+.card-img-wrapper {
+    height: 50px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+.card-img-wrapper img { height: 100%; object-fit: contain; }
+
+.hotkey-label {
+    position: absolute;
+    top: 5px;
+    left: 8px;
+    font-size: 0.7rem;
+    color: #ccc;
+}
+
+/* 4. BUTTONS & INPUTS */
+.btn {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.btn-primary { background: var(--geo-dark); color: white; }
+.btn-outline { background: #fff; color: #444; border: 2px solid #ddd; }
+.btn-recording { background: #dc3545 !important; color: white !important; animation: simple-pulse 1s infinite; }
+
+.btn:disabled { background: #ccc; cursor: not-allowed; }
+
+.btn-next-active {
+    background: var(--geo-red) !important; 
+    color: white !important;
+    animation: pulse-red 2s infinite; /* Renamed to pulse-red */
+}
+
+input[type="text"] {
+    width: 100%;
+    padding: 16px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1.2rem;
+    text-align: center;
+    outline: none;
+}
+input[type="text"]:focus { border-color: var(--geo-red); }
+
+/* 5. ANIMATIONS */
+@keyframes pulse-red {
+    0% { 
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--geo-red), transparent 30%); 
+    }
+    70% { 
+        box-shadow: 0 0 0 12px color-mix(in srgb, var(--geo-red), transparent 100%); 
+    }
+    100% { 
+        box-shadow: 0 0 0 0 color-mix(in srgb, var(--geo-red), transparent 100%); 
+    }
+}
+
+@keyframes simple-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.feedback-area {
+    min-height: 45px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.diff-char {
+    font-size: 1.4rem; /* Larger for readability */
+    letter-spacing: 1px;
+}
+
+.diff-deletion {
+    color: var(--geo-red);
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.diff-insertion {
+    color: #28a745;
+    background: #f0fff4;
+    border-bottom: 2px solid #28a745;
+    padding: 0 1px;
+    border-radius: 2px;
+}
+
+.diff-match {
+    color: #444;
+}
+{% endblock %}
+
+{% block content %}
+<div id="app" v-cloak>
+    {% raw %}
+    <div v-if="!currentCard" class="content-section" style="text-align:center; justify-content:center;">
+        <p v-if="!errorMessage">Loading...</p>
+        <p v-else style="color: var(--geo-red)">{{ errorMessage }}</p>
+    </div>
+
+    <div v-else class="content-section">
+        <div class="prompt-area">
+            <div v-if="currentCard.prompt.image || currentCard.prompt.audio" class="media-placeholder">
+                <img v-if="currentCard.prompt.image" :src="currentCard.prompt.image" class="question-img">
+                <button v-else-if="currentCard.prompt.audio" class="btn btn-outline" @click="handleAudioAutoplay" style="width:auto;">
+                    🔊 Replay Sound
+                </button>
+                <audio ref="audioPromptRef" :src="currentCard.prompt.audio" hidden></audio>
+            </div>
+            <h2 style="margin: 0; font-size: 1.3rem; white-space: pre-line;">{{ currentCard.prompt.text }}</h2>
+            <p v-if="currentCard.prompt.subtext" style="color: #666; margin: 8px 0 0 0;">{{ currentCard.prompt.subtext }}</p>
+        </div>
+
+        <div class="response-area">
+        	<div class="feedback-area">
+		    <div v-if="feedback.msg" :style="{ color: feedback.type === 'success' ? '#28a745' : 'var(--geo-red)', marginBottom: feedback.diff ? '4px' : '0' }">
+			{{ feedback.msg }}
+		    </div>
+
+		    <div v-if="feedback.type === 'error' && feedback.diff" class="diff-display">
+			<span v-for="(part, i) in feedback.diff" :key="i" :class="'diff-' + part.type" class="diff-char">
+			    {{ part.char }}
+			</span>
+		    </div>
+		</div>
+
+
+            <div v-if="currentCard.response?.choices" class="response-grid">
+                <div v-for="(choice, i) in currentCard.response.choices" 
+                    :key="i" class="card"
+                    :class="{ correct: selectedIndex === i && choice.isCorrect, incorrect: selectedIndex === i && !choice.isCorrect }"
+                    @click="selectCard(i, choice.isCorrect)">
+                    <span class="hotkey-label">{{ i + 1 }}</span>
+                    <div class="card-img-wrapper" v-if="choice.image"><img :src="choice.image"></div>
+                    <div>{{ choice.text }}</div>
+                </div>
+            </div>
+
+            <div v-if="currentCard.response?.textAnswer !== undefined && !currentCard.response?.choices" class="input-stack" style="display:flex; flex-direction:column; gap:12px;">
+                <input type="text" ref="textInputRef" v-model="textInput" placeholder="Type answer..." 
+                       @keyup.enter="checkText" @blur="checkText">
+                <button class="btn btn-primary" @click="checkText">Check Answer</button>
+            </div>
+
+            <div v-if="currentCard.response?.audioAnswer" class="input-stack" style="display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; gap:8px;">
+                    <button v-if="!recordedUrl || isRecording" class="btn btn-outline" :class="{ 'btn-recording': isRecording }" @click="handleRecordClick">
+                        {{ isRecording ? 'Stop' : '🎤 Record' }}
+                    </button>
+                    <button v-else class="btn btn-outline" @click="toggleUserPlayback">
+                        {{ userAudioPlaying ? '⏸ Pause' : '▶️ Your Audio' }}
+                    </button>
+                </div>
+                <button class="btn btn-primary" :disabled="!recordedUrl || isRecording" @click="toggleCorrectPlayback">
+                    {{ correctAudioPlaying ? '⏸ Pause' : '🔊 Listen and Compare' }}
+                </button>
+                <audio ref="userAudioRef" :src="recordedUrl" hidden></audio>
+                <audio ref="correctAudioRef" :src="currentCard.response.audioAnswer" hidden></audio>
+            </div>
+        </div>
+
+        <div class="footer-section" style="margin-top:auto; padding: 20px 0;">
+            <button class="btn btn-primary" 
+                    :class="{ 'btn-next-active': feedback.type === 'success' && nextCard }" 
+                    @click="advanceToNext" 
+                    :disabled="!nextCard">
+                {{ nextCard ? 'Next (Enter)' : 'Loading...' }}
+            </button>
+        </div>
+    </div>
+    {% endraw %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const API_BASE = "{{ config.api_base }}";
+    const { createApp, ref, nextTick, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            const currentCard = ref(null);
+            const nextCard = ref(null);
+            const errorMessage = ref('');
+            const drillId = new URLSearchParams(window.location.search).get('drill');
+            const selectedIndex = ref(null);
+            const textInput = ref('');
+            const textInputRef = ref(null);
+            const feedback = ref({msg: '', type: ''});
+            const recordedUrl = ref(null);
+            const isRecording = ref(false);
+            const userAudioPlaying = ref(false);
+            const correctAudioPlaying = ref(false);
+            const userAudioRef = ref(null);
+            const correctAudioRef = ref(null);
+            const audioPromptRef = ref(null);
+            let mediaRecorder = null;
+            let chunks = [];
+
+            const fetchQuestion = async () => {
+                if (!drillId) return null;
+                try {
+                    const response = await fetch(`${API_BASE}?drill=${drillId}`);
+                    const json = await response.json();
+                    return json.status === "ok" ? json.data : null;
+                } catch (e) { return null; }
+            };
+
+            const loadInitialData = async () => {
+                if (!drillId) {
+                    errorMessage.value = "No Drill ID provided in URL.";
+                    return;
+                }
+                const [first, second] = await Promise.all([fetchQuestion(), fetchQuestion()]);
+                if (first) {
+                    currentCard.value = first;
+                    nextCard.value = second;
+                    handleAudioAutoplay();
+                    if (textInputRef.value) nextTick(() => textInputRef.value.focus());
+                } else {
+                    errorMessage.value = "Error loading data.";
+                }
+            };
+
+            const advanceToNext = async () => {
+                if (!nextCard.value) return;
+                currentCard.value = nextCard.value;
+                nextCard.value = null;
+                selectedIndex.value = null;
+                textInput.value = '';
+                feedback.value = {msg: '', type: ''};
+                recordedUrl.value = null;
+                fetchQuestion().then(data => { nextCard.value = data; });
+                await nextTick();
+                handleAudioAutoplay();
+                if (textInputRef.value) textInputRef.value.focus();
+            };
+
+            const handleAudioAutoplay = async () => {
+                if (currentCard.value?.prompt?.audio) {
+                    await nextTick();
+                    if (audioPromptRef.value) {
+                        audioPromptRef.value.load();
+                        audioPromptRef.value.play().catch(() => {});
+                    }
+                }
+            };
+
+            const selectCard = (idx, isCorrect) => {
+                // Hotkeys always work now - user can change answer 
+                selectedIndex.value = idx;
+                feedback.value = isCorrect ? 
+                    {msg: '✅ Correct!', type: 'success'} : 
+                    {msg: '❌ Try again.', type: 'error'};
+            };
+
+	    const getDiff = (input, expected) => {
+	    	// longest common substring algorithm
+		    const n = input.length;
+		    const m = expected.length;
+
+		    // Create a 2D matrix for the Longest Common Subsequence
+		    const dp = Array(n + 1).fill(0).map(() => Array(m + 1).fill(0));
+
+		    for (let i = 1; i <= n; i++) {
+			    for (let j = 1; j <= m; j++) {
+				    if (input[i - 1] === expected[j - 1]) {
+					    dp[i][j] = dp[i - 1][j - 1] + 1;
+				    } else {
+					    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+				    }
+			    }
+		    }
+
+		    // Backtrack to build the diff
+		    let i = n, j = m;
+		    const result = [];
+
+		    while (i > 0 || j > 0) {
+			    if (i > 0 && j > 0 && input[i - 1] === expected[j - 1]) {
+				    // Characters match
+				    result.unshift({ char: input[i - 1], type: 'match' });
+				    i--; j--;
+			    } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+				    // This character was missing (Insertion needed)
+				    result.unshift({ char: expected[j - 1], type: 'insertion' });
+				    j--;
+			    } else if (i > 0 && (j === 0 || dp[i][j - 1] < dp[i - 1][j])) {
+				    // This character was extra (Deletion needed)
+				    result.unshift({ char: input[i - 1], type: 'deletion' });
+				    i--;
+			    }
+		    }
+		    return result;
+	    };
+
+	    const checkText = () => {
+		    const input = textInput.value.trim();
+		    const answer = currentCard.value?.response?.textAnswer || '';
+		    if (!input && !feedback.value.msg) return;
+		    const isCorrect = input.toLowerCase() === answer.toLowerCase();
+		    if (isCorrect) {
+			    feedback.value = { 
+				msg: '✅ Correct!', 
+				type: 'success', 
+				diff: null 
+			    };
+		    } else {
+			    feedback.value = { 
+				msg: '❌ Not quite.', 
+				type: 'error', 
+				diff: getDiff(input, answer) 
+			    };
+		    }
+	    };
+
+            const handleRecordClick = async () => {
+                if (isRecording.value) {
+                    mediaRecorder.stop();
+                    isRecording.value = false;
+                } else {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+                        mediaRecorder = new MediaRecorder(stream);
+                        chunks = [];
+                        mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                        mediaRecorder.onstop = async () => {
+                            recordedUrl.value = URL.createObjectURL(new Blob(chunks));
+                            await nextTick();
+                            userAudioRef.value.load();
+                            stream.getTracks().forEach(t => t.stop());
+                        };
+                        mediaRecorder.start();
+                        isRecording.value = true;
+                    } catch (err) {
+                        feedback.value = {msg: "Microphone access denied.", type: "error"};
+                    }
+                }
+            };
+
+            const toggleUserPlayback = () => {
+                const a = userAudioRef.value;
+                userAudioPlaying.value ? a.pause() : a.play();
+                userAudioPlaying.value = !userAudioPlaying.value;
+                a.onended = () => userAudioPlaying.value = false;
+            };
+
+            const toggleCorrectPlayback = () => {
+                const a = correctAudioRef.value;
+                correctAudioPlaying.value ? a.pause() : a.play();
+                correctAudioPlaying.value = !correctAudioPlaying.value;
+                if (!feedback.value.msg) feedback.value = {msg: 'Listen and compare!', type: 'success'};
+                a.onended = () => correctAudioPlaying.value = false;
+            };
+
+            onMounted(() => {
+                loadInitialData();
+                window.addEventListener('keydown', (e) => {
+		    // Number Keys: Select Multiple Choice
+                    if (currentCard.value?.response?.choices) {
+                        const num = parseInt(e.key);
+                        if (!isNaN(num) && num >= 1 && num <= currentCard.value.response.choices.length) {
+                            selectCard(num - 1, currentCard.value.response.choices[num - 1].isCorrect);
+                        }
+                    }
+                    // Enter Key: Check then Advance
+		    if (e.key === 'Enter') {
+			// If feedback is already showing, the user has seen the result, so move to next
+			if (feedback.value.msg) {
+			    if (nextCard.value) advanceToNext();
+			} 
+			// If no feedback is showing, this is the first press: run the check
+			else if (currentCard.value?.response?.textAnswer !== undefined) {
+			    checkText();
+			}
+		    }
+		    // Space Key: Play Audio
+                    if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
+                        e.preventDefault();
+                        handleAudioAutoplay();
+                    }
+                });
+            });
+
+            return {
+                currentCard, nextCard, errorMessage, selectedIndex, textInput, textInputRef, feedback,
+                recordedUrl, isRecording, userAudioPlaying, correctAudioPlaying, 
+                userAudioRef, correctAudioRef, audioPromptRef,
+                advanceToNext, selectCard, checkText, handleRecordClick,
+                toggleUserPlayback, toggleCorrectPlayback, handleAudioAutoplay
+            };
+        }
+    }).mount('#app');
+</script>
+{% endblock %}
