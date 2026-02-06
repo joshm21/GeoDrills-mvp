@@ -35,6 +35,40 @@
 			]
 		},
 		{
+			"title": "Numbers",
+			"sections": [
+				{
+					"heading": "Normal Numbers",
+					"lessons": [
+						"0 - 10",
+						"10 - 20",
+						"Tens",
+						"20 - 100",
+						"Hundreds",
+						"100 - 1,000",
+						"1,000+"
+					]
+				},
+				{
+					"heading": "Times",
+					"lessons": [
+						"On the hour",
+						"Up to the half hour",
+						"Past the half hour",
+						"Review All Times"
+					]
+				},
+				{
+					"heading": "Special Numbers",
+					"lessons": [
+						"1st - 20th",
+						"Once, two times...",
+						"Both, all three..."
+					]
+				}
+			]
+		},
+		{
 			"title": "Verbs",
 			"sections": [
 				{

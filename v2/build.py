@@ -10,6 +10,7 @@ TEMPLATE_DIR = 'templates'
 OUTPUT_DIR = 'dist'
 REGISTRY_FILE = 'drill_registry.json'
 
+
 def build():
     # 1. Load the human-readable schema
     if not os.path.exists(INPUT_SCHEMA):
@@ -30,14 +31,16 @@ def build():
     # 3. Data Processing & UUID Generation
     # We create a new registry and update the schema object with the IDs
     drill_registry = {}
-    nav_items = [{"title": p["title"], "url": f"{p['title']}.html"} for p in schema["pages"]]
+    nav_items = [{"title": p["title"], "url": f"{p['title']}.html"}
+                 for p in schema["pages"]]
 
     for page in schema["pages"]:
         for section in page["sections"]:
             processed_lessons = []
             for lesson in section["lessons"]:
                 # Handle both simple string lessons and object lessons
-                lesson_name = lesson if isinstance(lesson, str) else lesson['name']
+                lesson_name = lesson if isinstance(
+                    lesson, str) else lesson['name']
                 lesson_data = {"name": lesson_name, "levels": []}
 
                 # Generate 3 levels with fresh UUIDs
@@ -52,11 +55,11 @@ def build():
 
                     # Store mapping for the API registry
                     drill_registry[u] = [
-                            page['title'],
-                            section['heading'],
-                            lesson_name,
-                            i
-                            ]
+                        page['title'],
+                        section['heading'],
+                        lesson_name,
+                        i
+                    ]
                 processed_lessons.append(lesson_data)
 
             # Replace the simple string list with our enriched object list
@@ -70,10 +73,10 @@ def build():
     for page in schema["pages"]:
         output_path = os.path.join(OUTPUT_DIR, f"{page['title']}.html")
         rendered_html = list_template.render(
-                page=page,
-                nav_items=nav_items,
-                config=schema.get("config", {})
-                )
+            page=page,
+            nav_items=nav_items,
+            config=schema.get("config", {})
+        )
         with open(output_path, "w", encoding='utf-8') as f:
             f.write(rendered_html)
 
@@ -81,10 +84,10 @@ def build():
     app_template = env.get_template('app.j2')
     app_output_path = os.path.join(OUTPUT_DIR, "App.html")
     rendered_app = app_template.render(
-            page={"title": "Drill"}, # Dummy page object for the nav active state
-            nav_items=nav_items,
-            config=schema.get("config", {})
-            )
+        page={"title": "Drill"},  # Dummy page object for the nav active state
+        nav_items=nav_items,
+        config=schema.get("config", {})
+    )
     with open(app_output_path, "w", encoding='utf-8') as f:
         f.write(rendered_app)
 
@@ -92,9 +95,9 @@ def build():
     index_template = env.get_template('index.j2')
     index_output_path = os.path.join(OUTPUT_DIR, "index.html")
     rendered_index = index_template.render(
-            page={"title": "Home"},
-            nav_items=nav_items,
-            config=schema.get("config", {})
+        page={"title": "Home"},
+        nav_items=nav_items,
+        config=schema.get("config", {})
     )
     with open(index_output_path, "w", encoding='utf-8') as f:
         f.write(rendered_index)
@@ -102,8 +105,9 @@ def build():
     # 8. Save the Registry for your API
     json_string = json.dumps(drill_registry, indent=2, ensure_ascii=False)
     json_string = re.sub(r'\[\s+([^\]]+?)\s+\]',
-                         lambda m: "[" + re.sub(r'\s*\n\s*', ' ', m.group(1)) + "]",
-                         json_string) # collapse lists into a single line
+                         lambda m: "[" +
+                         re.sub(r'\s*\n\s*', ' ', m.group(1)) + "]",
+                         json_string)  # collapse lists into a single line
     with open(REGISTRY_FILE, 'w', encoding='utf-8') as f:
         f.write(json_string)
 
@@ -111,6 +115,7 @@ def build():
     print(f"   - {len(drill_registry)} fresh UUIDs generated.")
     print(f"   - Registry saved to {REGISTRY_FILE} (Upload this to your API).")
     print(f"   - HTML files generated in /{OUTPUT_DIR}")
+
 
 if __name__ == "__main__":
     build()
