@@ -208,7 +208,6 @@ input[type="text"]:focus { border-color: var(--geo-red); }
                 <button v-else-if="currentCard.prompt.audio" class="btn btn-outline" @click="handleAudioAutoplay" style="width:auto;">
                     🔊 Replay Sound
                 </button>
-                <audio ref="audioPromptRef" :src="currentCard.prompt.audio" hidden></audio>
             </div>
             <h2 style="margin: 0; font-size: 1.3rem; white-space: pre-line;">{{ currentCard.prompt.text }}</h2>
             <p v-if="currentCard.prompt.subtext" style="color: #666; margin: 8px 0 0 0;">{{ currentCard.prompt.subtext }}</p>
@@ -296,7 +295,7 @@ input[type="text"]:focus { border-color: var(--geo-red); }
             const correctAudioPlaying = ref(false);
             const userAudioRef = ref(null);
             const correctAudioRef = ref(null);
-            const audioPromptRef = ref(null);
+	    let activeAudioPool = []; // To track and stop playing audio
             let mediaRecorder = null;
             let chunks = [];
 
@@ -326,6 +325,13 @@ input[type="text"]:focus { border-color: var(--geo-red); }
             };
 
             const advanceToNext = async () => {
+		// Stop all audio from the current card before moving to the next
+		activeAudioPool.forEach(a => {
+			a.pause();
+			a.onended = null;
+		});
+		activeAudioPool = [];
+
                 if (!nextCard.value) return;
                 currentCard.value = nextCard.value;
                 nextCard.value = null;
@@ -339,16 +345,46 @@ input[type="text"]:focus { border-color: var(--geo-red); }
                 if (textInputRef.value) textInputRef.value.focus();
             };
 
-            const handleAudioAutoplay = async () => {
-                if (currentCard.value?.prompt?.audio) {
-                    await nextTick();
-                    if (audioPromptRef.value) {
-                        audioPromptRef.value.load();
-                        audioPromptRef.value.play().catch(() => {});
-                    }
-                }
-            };
+		const handleAudioAutoplay = async () => {
+		    // 1. Stop any audio currently playing from a previous card or replay
+		    activeAudioPool.forEach(audio => {
+			audio.pause();
+			audio.onended = null;
+		    });
+		    activeAudioPool = [];
 
+		    const audioData = currentCard.value?.prompt?.audio;
+		    if (!audioData) return;
+
+		    // 2. Normalize to an array (handles both single strings and arrays)
+		    const playlist = Array.isArray(audioData) ? audioData : [audioData];
+
+		    // 3. Pre-create all Audio objects to start preloading immediately
+		    activeAudioPool = playlist.map(url => {
+			const a = new Audio(url);
+			a.preload = "auto"; 
+			return a;
+		    });
+
+		    // 4. Sequence logic
+		    const playNext = (index) => {
+			if (index >= activeAudioPool.length) return;
+
+			const currentAudio = activeAudioPool[index];
+			
+			// When this clip ends, start the next one immediately
+			currentAudio.onended = () => playNext(index + 1);
+			
+			currentAudio.play().catch(e => {
+			    console.warn("Autoplay blocked or interrupted:", e);
+			});
+		    };
+
+		    // 5. Start the first clip
+		    if (activeAudioPool.length > 0) {
+			playNext(0);
+		    }
+		};
             const selectCard = (idx, isCorrect) => {
                 // Hotkeys always work now - user can change answer 
                 selectedIndex.value = idx;
@@ -488,7 +524,7 @@ input[type="text"]:focus { border-color: var(--geo-red); }
             return {
                 currentCard, nextCard, errorMessage, selectedIndex, textInput, textInputRef, feedback,
                 recordedUrl, isRecording, userAudioPlaying, correctAudioPlaying, 
-                userAudioRef, correctAudioRef, audioPromptRef,
+                userAudioRef, correctAudioRef,
                 advanceToNext, selectCard, checkText, handleRecordClick,
                 toggleUserPlayback, toggleCorrectPlayback, handleAudioAutoplay
             };
